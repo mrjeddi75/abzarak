@@ -3,6 +3,8 @@ import { create } from "zustand";
 interface AppStore {
   activeTool: string;
   setActiveTool: (id: string) => void;
+  activeCategory: string | null;
+  setActiveCategory: (id: string | null) => void;
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
   toggleSidebar: () => void;
@@ -15,8 +17,10 @@ interface AppStore {
 }
 
 export const useAppStore = create<AppStore>((set, get) => ({
-  activeTool: "home",
-  setActiveTool: (id) => set({ activeTool: id, sidebarOpen: false }),
+    activeTool: "home",
+  setActiveTool: (id) => set({ activeTool: id, activeCategory: null, sidebarOpen: false }),
+  activeCategory: null,
+  setActiveCategory: (id) => set({ activeCategory: id }),
   sidebarOpen: false,
   setSidebarOpen: (open) => set({ sidebarOpen: open }),
   toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),

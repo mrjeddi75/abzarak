@@ -46,8 +46,7 @@ const categoryIcons: Record<string, string> = {
 export default function HomeDashboard() {
   const [time, setTime] = useState("");
   const [weekday, setWeekday] = useState<string>("");
-  const { setActiveTool, theme, toggleTheme } = useAppStore();
-
+  const { setActiveTool, setActiveCategory, activeCategory, theme, toggleTheme } = useAppStore();
   const today = getJalaliToday();
   const day = today[2];
   const month = today[1];
@@ -162,10 +161,7 @@ export default function HomeDashboard() {
           {nonHomeCategories.map((cat, idx) => (
             <button
               key={cat.id}
-              onClick={() => {
-                const firstTool = cat.tools[0];
-                if (firstTool) setActiveTool(firstTool.id);
-              }}
+               onClick={() => setActiveCategory(cat.id)}
               className={cn(
                 "glass-card hover-glow p-4 text-right transition-all duration-300 animate-scale-in",
                 `stagger-${Math.min(idx + 3, 10)}`,
@@ -188,7 +184,52 @@ export default function HomeDashboard() {
           ))}
         </div>
       </div>
-
+             {/* Category Detail View */}
+      {activeCategory && (() => {
+        const cat = nonHomeCategories.find((c) => c.id === activeCategory);
+        if (!cat) return null;
+        return (
+          <div className="animate-fade-in-up">
+            <div className="flex items-center gap-3 mb-5">
+              <button
+                onClick={() => setActiveCategory(null)}
+                className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                <LucideIcons.ArrowRight className="h-4 w-4" />
+                <span>بازگشت</span>
+              </button>
+              <div className="flex items-center gap-2">
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/15 text-primary">
+                  <ToolIcon name={categoryIcons[cat.id] || cat.icon} className="h-4 w-4" />
+                </div>
+                <h2 className="text-base font-bold text-foreground">{cat.name}</h2>
+                <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-full bg-secondary">
+                  {toPersianDigits(String(cat.tools.length))} ابزار
+                </span>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {cat.tools.map((tool) => (
+                <button
+                  key={tool.id}
+                  onClick={() => setActiveTool(tool.id)}
+                  className="glass-card hover-glow p-4 text-right transition-all duration-200 flex items-center gap-3"
+                >
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <ToolIcon name={tool.icon} className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate">{tool.name}</p>
+                    <p className="text-xs text-muted-foreground truncate mt-0.5">{tool.description}</p>
+                  </div>
+                  <LucideIcons.ChevronLeft className="h-4 w-4 text-muted-foreground/50 shrink-0 mr-auto" />
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+      
       {/* Quick Access - Popular Tools */}
       <div className="animate-fade-in-up stagger-3">
         <h2 className="text-base font-bold text-foreground mb-4">دسترسی سریع</h2>
