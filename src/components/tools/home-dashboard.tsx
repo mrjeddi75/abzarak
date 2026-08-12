@@ -94,18 +94,44 @@ export default function HomeDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Digital Clock */}
-      <div className="glass-card glow-effect p-6 sm:p-8 animate-fade-in-up">
-        <div className="flex flex-col items-center">
-          <p className="text-lg font-semibold text-foreground mb-3">
-            {toPersianDigits(String(day))} {monthName} {toPersianDigits(String(year))} — {weekday}
-          </p>
-          <div className="flex items-baseline gap-1 font-mono">
-            <span className="text-5xl sm:text-6xl font-bold text-foreground tabular-nums tracking-tight">{hours}</span>
-            <span className="text-5xl sm:text-6xl font-bold text-primary animate-blink">:</span>
-            <span className="text-5xl sm:text-6xl font-bold text-foreground tabular-nums tracking-tight">{minutes}</span>
-            <span className="text-5xl sm:text-6xl font-bold text-primary animate-blink">:</span>
-            <span className="text-5xl sm:text-6xl font-bold text-primary tabular-nums tracking-tight">{seconds}</span>
+            {/* Apple-style Clock */}
+      <div className="animate-fade-in-up">
+        <div className="glass-card glow-effect p-6 sm:p-10 overflow-hidden relative">
+          {/* Ambient gradient orbs */}
+          <div className="absolute -top-20 -right-20 w-48 h-48 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-16 -left-16 w-40 h-40 rounded-full bg-violet-500/5 blur-3xl pointer-events-none" />
+
+          <div className="relative flex flex-col items-center">
+            {/* Date pill */}
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary/60 text-muted-foreground text-sm mb-6 backdrop-blur-sm">
+              <span>{weekday}</span>
+              <span className="text-foreground/40">|</span>
+              <span className="font-medium text-foreground/80">
+                {toPersianDigits(String(day))} {monthName} {toPersianDigits(String(year))}
+              </span>
+            </div>
+
+            {/* Main time — Apple typography style */}
+            <div className="flex items-center justify-center gap-0.5 font-light tracking-tighter select-none" style={{ fontFamily: "'SF Pro Display', 'Vazirmatn', -apple-system, system-ui, sans-serif" }}>
+              <span className="text-7xl sm:text-8xl md:text-9xl text-foreground leading-none" style={{ fontWeight: 200 }}>
+                {hours}
+              </span>
+              <span className="text-7xl sm:text-8xl md:text-9xl text-foreground/25 leading-none animate-blink" style={{ fontWeight: 100 }}>
+                :
+              </span>
+              <span className="text-7xl sm:text-8xl md:text-9xl text-foreground leading-none" style={{ fontWeight: 200 }}>
+                {minutes}
+              </span>
+            </div>
+
+            {/* Seconds — Apple Watch thin style */}
+            <div className="mt-3 flex items-center gap-1.5">
+              <div className="h-1 w-1 rounded-full bg-primary/40 animate-pulse" />
+              <span className="text-base sm:text-lg font-light text-muted-foreground tabular-nums tracking-widest" style={{ fontWeight: 300 }}>
+                {seconds}
+              </span>
+              <span className="text-[11px] font-light text-muted-foreground/50 ml-1" style={{ fontWeight: 300 }}>ثانیه</span>
+            </div>
           </div>
         </div>
       </div>
