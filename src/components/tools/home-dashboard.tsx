@@ -112,7 +112,7 @@ export default function HomeDashboard() {
             </div>
 
             {/* Main time — Apple typography style */}
-            <div className="flex items-center justify-center gap-0.5 font-light tracking-tighter select-none" style={{ fontFamily: "'SF Pro Display', 'Vazirmatn', -apple-system, system-ui, sans-serif" }}>
+            <div dir="ltr" className="flex items-center justify-center gap-0.5 font-light tracking-tighter select-none" style={{ fontFamily: "'SF Pro Display', 'Vazirmatn', -apple-system, system-ui, sans-serif" }}>
               <span className="text-7xl sm:text-8xl md:text-9xl text-foreground leading-none" style={{ fontWeight: 200 }}>
                 {hours}
               </span>
