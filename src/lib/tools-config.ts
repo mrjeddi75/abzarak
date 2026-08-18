@@ -28,7 +28,7 @@ export const toolCategories: ToolCategory[] = [
     icon: "Calculator",
     tools: [
       { id: "calculator", name: "ماشین‌حساب", description: "ماشین‌حساب پیشرفته", icon: "Calculator", component: "Calculator", seoTip: "ماشین‌حساب آنلاین رایگان با قابلیت محاسبات علمی و هیستوری" },
-      { id: "bmi", name: "شاخص توده بدنی", description: "محاسبه BMI و بررسی وضعیت وزن", icon: "Scale", component: "BMI", seoTip: "محاسبه شاخص توده بدنی (BMI) و بررسی وضعیت وزن ایده‌آل" },
+      { id: "bmi", name: "شاخص توده بدنی", description: "محاسبه BMI و بررسی وضعیت وزن", icon: "Scale", component: "BMI" },
       { id: "interest", name: "سود بانکی", description: "محاسبه سود سپرده و وام بانکی", icon: "TrendingUp", component: "Interest" },
       { id: "percent", name: "محاسبه درصد", description: "انواع محاسبات درصدی", icon: "Percent", component: "Percent" },
       { id: "area", name: "مساحت و محیط", description: "مساحت و محیط اشکال هندسی", icon: "Square", component: "Area" },
@@ -113,6 +113,16 @@ export const toolCategories: ToolCategory[] = [
       { id: "random-picker", name: "تصادفی و قرعه‌کشی", description: "عدد تصادفی و قرعه‌کشی", icon: "Shuffle", component: "RandomPicker" },
       { id: "qrcode", name: "تولید QR Code", description: "تولید کد QR از متن و لینک", icon: "QrCode", component: "QRCodeGenerator" },
       { id: "image-to-base64", name: "تصویر به Base64", description: "تبدیل تصویر به کد Base64", icon: "Image", component: "ImageToBase64" },
+    ],
+  },
+  {
+    id: "media",
+    name: "رسانه و فایل",
+    icon: "Image",
+    tools: [
+      { id: "image-compressor", name: "فشرده‌ساز عکس", description: "کاهش حجم عکس بدون افت قابل مشاهده کیفیت", icon: "ImageMinus", component: "ImageCompressor", seoTip: "فشرده‌سازی آنلاین عکس با حفظ کیفیت — کاهش حجم JPEG, PNG, WebP" },
+      { id: "image-to-pdf", name: "تبدیل عکس به PDF", description: "تبدیل چند عکس به فایل PDF با تنظیمات صفحه", icon: "FileImage", component: "ImageToPdf", seoTip: "تبدیل آنلاین عکس به PDF — چند عکس را به یک فایل PDF تبدیل کنید" },
+      { id: "speech-to-text", name: "تبدیل صوت به متن", description: "تبدیل گفتار به متن با زبان فارسی", icon: "Mic", component: "SpeechToText", seoTip: "تبدیل صوت به متن فارسی آنلاین — تایپ صوتی بدون کیبورد" },
     ],
   },
   {

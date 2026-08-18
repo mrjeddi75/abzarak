@@ -65,6 +65,9 @@ import DataUnitConverter from "@/components/tools/data-unit-converter";
 import PingTool from "@/components/tools/ping-tool";
 import TracerouteTool from "@/components/tools/traceroute-tool";
 import Weather from "@/components/tools/weather";
+import ImageCompressor from "@/components/tools/image-compressor";
+import ImageToPdf from "@/components/tools/image-to-pdf";
+import SpeechToText from "@/components/tools/speech-to-text";
 
 const componentMap: Record<string, React.ComponentType> = {
   IranClock,
@@ -128,6 +131,9 @@ const componentMap: Record<string, React.ComponentType> = {
   PingTool,
   TracerouteTool,
   Weather,
+  ImageCompressor,
+  ImageToPdf,
+  SpeechToText,
 };
 
 export default function ToolContent({ toolId }: { toolId: string }) {
