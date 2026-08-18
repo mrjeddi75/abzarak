@@ -44,7 +44,7 @@ export default function ImageCompressor() {
   const compressImage = useCallback(
     (file: File): Promise<CompressedImage | null> => {
       return new Promise((resolve) => {
-        const img = new Image();
+        const img = new window.Image();
         const url = URL.createObjectURL(file);
 
         img.onload = () => {
