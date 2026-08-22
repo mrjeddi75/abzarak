@@ -116,6 +116,18 @@ export const toolCategories: ToolCategory[] = [
     ],
   },
   {
+    id: "social",
+    name: "سوشال مدیا",
+    icon: "Share2",
+    tools: [
+      { id: "instagram-bio", name: "تولیدکننده بیو اینستاگرام", description: "ساخت بیو حرفه‌ای با فونت‌های زیبا", icon: "Instagram", component: "InstagramBio", seoTip: "تولید بیو اینستاگرام آنلاین — بیو حرفه‌ای با فونت زیبا و ایموجی" },
+      { id: "instagram-post-time", name: "بهترین زمان پست", description: "نقشه تعامل ساعتی اینستاگرام", icon: "Clock", component: "InstagramPostTime", seoTip: "بهترین زمان انتشار پست اینستاگرام — جدول تعامل ساعتی برای مخاطبان ایرانی" },
+      { id: "social-media-preview", name: "پیش‌نمایش پست", description: "پیش‌نمایش پست در توییتر، لینکدین، اینستاگرام و فیسبوک", icon: "Eye", component: "SocialMediaPreview", seoTip: "پیش‌نمایش پست شبکه‌های اجتماعی — قبل از انتشار ببینید" },
+      { id: "youtube-earnings", name: "درآمد یوتیوب", description: "محاسبه تقریبی درآمد از یوتیوب", icon: "Youtube", component: "YoutubeEarnings", seoTip: "محاسبه درآمد یوتیوب — تخمین درآمد ماهانه بر اساس بازدید و CPM" },
+      { id: "engagement-calculator", name: "نرخ تعامل", description: "محاسبه نرخ تعامل اینستاگرام و یوتیوب", icon: "BarChart3", component: "EngagementCalculator", seoTip: "محاسبه نرخ تعامل اینستاگرام — بررسی عملکرد پیج" },
+    ],
+  },
+  {
     id: "media",
     name: "رسانه و فایل",
     icon: "Image",

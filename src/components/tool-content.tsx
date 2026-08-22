@@ -68,6 +68,11 @@ import Weather from "@/components/tools/weather";
 import ImageCompressor from "@/components/tools/image-compressor";
 import ImageToPdf from "@/components/tools/image-to-pdf";
 import SpeechToText from "@/components/tools/speech-to-text";
+import InstagramBio from "@/components/tools/instagram-bio";
+import InstagramPostTime from "@/components/tools/instagram-post-time";
+import SocialMediaPreview from "@/components/tools/social-media-preview";
+import YoutubeEarnings from "@/components/tools/youtube-earnings";
+import EngagementCalculator from "@/components/tools/engagement-calculator";
 
 const componentMap: Record<string, React.ComponentType> = {
   IranClock,
@@ -134,6 +139,11 @@ const componentMap: Record<string, React.ComponentType> = {
   ImageCompressor,
   ImageToPdf,
   SpeechToText,
+  InstagramBio,
+  InstagramPostTime,
+  SocialMediaPreview,
+  YoutubeEarnings,
+  EngagementCalculator,
 };
 
 export default function ToolContent({ toolId }: { toolId: string }) {
