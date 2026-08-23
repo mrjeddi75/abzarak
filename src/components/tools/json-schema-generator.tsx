@@ -1,0 +1,392 @@
+'use client';
+
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Braces, Copy, Check, ArrowLeftRight, FileJson } from 'lucide-react';
+
+interface FieldDef {
+  name: string;
+  type: string;
+  required: boolean;
+  description: string;
+  example: string;
+}
+
+const typeOptions = [
+  { value: 'string', label: 'رشته (String)' },
+  { value: 'number', label: 'عدد (Number)' },
+  { value: 'integer', label: 'عدد صحیح (Integer)' },
+  { value: 'boolean', label: 'بولی (Boolean)' },
+  { value: 'array', label: 'آرایه (Array)' },
+  { value: 'object', label: 'شیء (Object)' },
+  { value: 'null', label: 'خالی (Null)' },
+];
+
+const sampleInputs = [
+  {
+    title: 'کاربر',
+    json: JSON.stringify({
+      name: 'علی محمدی',
+      email: 'ali@example.com',
+      age: 28,
+      isActive: true,
+      role: 'admin',
+      tags: ['developer', 'designer'],
+      address: { city: 'تهران', street: 'ولیعصر' },
+      createdAt: '2024-01-15T10:30:00Z'
+    }, null, 2),
+  },
+  {
+    title: 'محصول',
+    json: JSON.stringify({
+      id: 1,
+      title: 'گوشی موبایل',
+      price: 15000000,
+      inStock: true,
+      category: 'electronics',
+      images: ['url1.jpg', 'url2.jpg'],
+      rating: 4.5
+    }, null, 2),
+  },
+  {
+    title: 'سفارش',
+    json: JSON.stringify({
+      orderId: 'ORD-1234',
+      customerName: 'مریم رضایی',
+      items: [
+        { productId: 1, quantity: 2, price: 50000 },
+        { productId: 5, quantity: 1, price: 120000 }
+      ],
+      totalAmount: 220000,
+      status: 'completed',
+      isPaid: true
+    }, null, 2),
+  },
+];
+
+function inferFieldType(value: unknown): string {
+  if (value === null) return 'null';
+  if (Array.isArray(value)) return 'array';
+  if (typeof value === 'object') return 'object';
+  return typeof value;
+}
+
+function jsonToFields(json: string): FieldDef[] {
+  try {
+    const obj = JSON.parse(json);
+    if (typeof obj !== 'object' || obj === null || Array.isArray(obj)) return [];
+    return Object.entries(obj).map(([key, value]) => ({
+      name: key,
+      type: inferFieldType(value),
+      required: true,
+      description: '',
+      example: Array.isArray(value) ? JSON.stringify(value) : typeof value === 'object' ? JSON.stringify(value) : String(value),
+    }));
+  } catch {
+    return [];
+  }
+}
+
+function fieldsToJsonSchema(fields: FieldDef[], rootTitle: string): string {
+  const properties: Record<string, any> = {};
+  const required: string[] = [];
+
+  fields.forEach(field => {
+    const prop: any = { type: field.type };
+    if (field.description) prop.description = field.description;
+    if (field.example) prop.example = field.type === 'string' ? field.example : 
+      (field.type === 'array' || field.type === 'object') ? (() => { try { return JSON.parse(field.example); } catch { return field.example; } })() : 
+      field.type === 'number' || field.type === 'integer' ? Number(field.example) : 
+      field.type === 'boolean' ? field.example === 'true' : field.example;
+
+    if (field.type === 'array') {
+      prop.type = 'array';
+      prop.items = { type: 'string' };
+    }
+    if (field.type === 'object') {
+      prop.type = 'object';
+      prop.additionalProperties = true;
+    }
+
+    properties[field.name] = prop;
+    if (field.required) required.push(field.name);
+  });
+
+  const schema: any = {
+    $schema: 'https://json-schema.org/draft/2020-12/schema',
+    type: 'object',
+    title: rootTitle,
+    properties,
+  };
+  if (required.length > 0) schema.required = required;
+
+  return JSON.stringify(schema, null, 2);
+}
+
+function jsonToSchema(json: string, rootTitle: string): string {
+  const fields = jsonToFields(json);
+  if (fields.length === 0) return '';
+  return fieldsToJsonSchema(fields, rootTitle);
+}
+
+export default function JsonSchemaGenerator() {
+  const [mode, setMode] = useState<'json' | 'manual'>('json');
+  const [jsonInput, setJsonInput] = useState('');
+  const [schemaTitle, setSchemaTitle] = useState('MySchema');
+  const [fields, setFields] = useState<FieldDef[]>([
+    { name: 'id', type: 'integer', required: true, description: 'شناسه', example: '1' },
+    { name: 'name', type: 'string', required: true, description: 'نام', example: '' },
+    { name: 'email', type: 'string', required: true, description: 'ایمیل', example: '' },
+  ]);
+  const [schemaOutput, setSchemaOutput] = useState('');
+  const [copied, setCopied] = useState(false);
+  const [error, setError] = useState('');
+
+  const generateFromJson = () => {
+    setError('');
+    const schema = jsonToSchema(jsonInput, schemaTitle);
+    if (!schema) {
+      setError('JSON نامعتبر است. لطفا یک JSON معتبر وارد کنید.');
+      setSchemaOutput('');
+      return;
+    }
+    setSchemaOutput(schema);
+  };
+
+  const generateFromFields = () => {
+    setError('');
+    if (fields.length === 0) {
+      setError('حداقل یک فیلد اضافه کنید.');
+      return;
+    }
+    setSchemaOutput(fieldsToJsonSchema(fields, schemaTitle));
+  };
+
+  const addField = () => {
+    setFields(prev => [...prev, { name: '', type: 'string', required: false, description: '', example: '' }]);
+  };
+
+  const removeField = (index: number) => {
+    if (fields.length <= 1) return;
+    setFields(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const updateField = (index: number, key: keyof FieldDef, value: string | boolean) => {
+    setFields(prev => prev.map((f, i) => i === index ? { ...f, [key]: value } : f));
+  };
+
+  const loadSample = (json: string) => {
+    setJsonInput(json);
+    setMode('json');
+    setError('');
+    setSchemaOutput('');
+  };
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(schemaOutput);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleJsonToFields = () => {
+    const parsed = jsonToFields(jsonInput);
+    if (parsed.length > 0) {
+      setFields(parsed);
+      setMode('manual');
+      setError('');
+    } else {
+      setError('نتوانستیم فیلدها را از JSON استخراج کنیم.');
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardContent className="pt-4 pb-4">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex-1">
+              <Label>عنوان Schema</Label>
+              <Input
+                value={schemaTitle}
+                onChange={e => setSchemaTitle(e.target.value)}
+                placeholder="MySchema"
+                dir="ltr"
+                className="mt-1"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button variant={mode === 'json' ? 'default' : 'outline'} size="sm" onClick={() => setMode('json')}>
+                <FileJson className="h-4 w-4 ml-1" />
+                از JSON
+              </Button>
+              <Button variant={mode === 'manual' ? 'default' : 'outline'} size="sm" onClick={() => setMode('manual')}>
+                <Braces className="h-4 w-4 ml-1" />
+                دستی
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="pt-4 pb-4">
+          <Label className="text-xs text-muted-foreground">نمونه‌های آماده:</Label>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {sampleInputs.map((sample, i) => (
+              <Button key={i} variant="outline" size="sm" onClick={() => loadSample(sample.json)}>
+                {sample.title}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {mode === 'json' && (
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg">ورودی JSON</CardTitle>
+              <Button variant="outline" size="sm" onClick={handleJsonToFields}>
+                <ArrowLeftRight className="h-4 w-4 ml-1" />
+                ویرایش دستی فیلدها
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Textarea
+              value={jsonInput}
+              onChange={e => { setJsonInput(e.target.value); setError(''); setSchemaOutput(''); }}
+              placeholder='{ "name": "علی", "age": 30 }'
+              dir="ltr"
+              className="min-h-[200px] resize-y font-mono text-sm"
+            />
+            <Button onClick={generateFromJson}>
+              <Braces className="h-4 w-4 ml-2" />
+              تولید Schema
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {mode === 'manual' && (
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg">تعریف فیلدها</CardTitle>
+              <Button variant="outline" size="sm" onClick={addField}>
+                + افزودن فیلد
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {fields.map((field, i) => (
+              <div key={i} className="p-3 rounded-lg bg-muted/50 space-y-3">
+                <div className="grid grid-cols-12 gap-2 items-end">
+                  <div className="col-span-12 sm:col-span-3">
+                    <Label className="text-xs">نام فیلد</Label>
+                    <Input
+                      value={field.name}
+                      onChange={e => updateField(i, 'name', e.target.value)}
+                      placeholder="fieldName"
+                      dir="ltr"
+                      className="mt-1 text-sm"
+                    />
+                  </div>
+                  <div className="col-span-6 sm:col-span-3">
+                    <Label className="text-xs">نوع</Label>
+                    <select
+                      value={field.type}
+                      onChange={e => updateField(i, 'type', e.target.value)}
+                      className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm mt-1"
+                    >
+                      {typeOptions.map(t => (
+                        <option key={t.value} value={t.value}>{t.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="col-span-6 sm:col-span-3">
+                    <Label className="text-xs">مثال</Label>
+                    <Input
+                      value={field.example}
+                      onChange={e => updateField(i, 'example', e.target.value)}
+                      placeholder="مقدار نمونه"
+                      dir="ltr"
+                      className="mt-1 text-sm"
+                    />
+                  </div>
+                  <div className="col-span-12 sm:col-span-3 flex items-center gap-2">
+                    <label className="flex items-center gap-1.5 cursor-pointer text-sm">
+                      <input
+                        type="checkbox"
+                        checked={field.required}
+                        onChange={e => updateField(i, 'required', e.target.checked)}
+                        className="rounded"
+                      />
+                      الزامی
+                    </label>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => removeField(i)}
+                      disabled={fields.length <= 1}
+                    >
+                      <span className="text-red-500 text-lg">×</span>
+                    </Button>
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-xs">توضیحات</Label>
+                  <Input
+                    value={field.description}
+                    onChange={e => updateField(i, 'description', e.target.value)}
+                    placeholder="توضیح فیلد..."
+                    className="mt-1 text-sm"
+                  />
+                </div>
+              </div>
+            ))}
+            <Button onClick={generateFromFields}>
+              <Braces className="h-4 w-4 ml-2" />
+              تولید Schema
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {error && (
+        <Card className="border-red-500/50">
+          <CardContent className="pt-4 pb-4">
+            <p className="text-sm text-red-500">{error}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {schemaOutput && (
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg">خروجی JSON Schema</CardTitle>
+              <Button variant="ghost" size="sm" onClick={handleCopy}>
+                {copied ? <Check className="h-4 w-4 ml-1" /> : <Copy className="h-4 w-4 ml-1" />}
+                کپی
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <pre
+              className="bg-muted rounded-lg p-4 text-sm font-mono overflow-x-auto leading-relaxed"
+              dir="ltr"
+            >
+              {schemaOutput}
+            </pre>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
