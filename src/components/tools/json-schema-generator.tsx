@@ -1,11 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Braces, Copy, Check, ArrowLeftRight, FileJson } from 'lucide-react';
 
 interface FieldDef {
@@ -203,105 +199,100 @@ export default function JsonSchemaGenerator() {
     }
   };
 
+  const inputCls = 'w-full h-10 rounded-lg border border-[var(--input)] bg-[var(--background)] px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[var(--ring)]';
+  const labelCls = 'block text-sm font-medium text-foreground mb-1';
+
   return (
     <div className="space-y-4">
-      <Card>
-        <CardContent className="pt-4 pb-4">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="flex-1">
-              <Label>عنوان Schema</Label>
-              <Input
-                value={schemaTitle}
-                onChange={e => setSchemaTitle(e.target.value)}
-                placeholder="MySchema"
-                dir="ltr"
-                className="mt-1"
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button variant={mode === 'json' ? 'default' : 'outline'} size="sm" onClick={() => setMode('json')}>
-                <FileJson className="h-4 w-4 ml-1" />
-                از JSON
-              </Button>
-              <Button variant={mode === 'manual' ? 'default' : 'outline'} size="sm" onClick={() => setMode('manual')}>
-                <Braces className="h-4 w-4 ml-1" />
-                دستی
-              </Button>
-            </div>
+      <div className="glass-card glow-effect p-4">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex-1">
+            <label className={labelCls}>عنوان Schema</label>
+            <input
+              value={schemaTitle}
+              onChange={e => setSchemaTitle(e.target.value)}
+              placeholder="MySchema"
+              dir="ltr"
+              className={`${inputCls} mt-1`}
+            />
           </div>
-        </CardContent>
-      </Card>
+          <div className="flex gap-2 items-end">
+            <Button variant={mode === 'json' ? 'default' : 'outline'} size="sm" onClick={() => setMode('json')}>
+              <FileJson className="h-4 w-4 ml-1" />
+              از JSON
+            </Button>
+            <Button variant={mode === 'manual' ? 'default' : 'outline'} size="sm" onClick={() => setMode('manual')}>
+              <Braces className="h-4 w-4 ml-1" />
+              دستی
+            </Button>
+          </div>
+        </div>
+      </div>
 
-      <Card>
-        <CardContent className="pt-4 pb-4">
-          <Label className="text-xs text-muted-foreground">نمونه‌های آماده:</Label>
-          <div className="flex flex-wrap gap-2 mt-2">
-            {sampleInputs.map((sample, i) => (
-              <Button key={i} variant="outline" size="sm" onClick={() => loadSample(sample.json)}>
-                {sample.title}
-              </Button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <div className="glass-card glow-effect p-4">
+        <label className="text-xs text-muted-foreground">نمونه‌های آماده:</label>
+        <div className="flex flex-wrap gap-2 mt-2">
+          {sampleInputs.map((sample, i) => (
+            <Button key={i} variant="outline" size="sm" onClick={() => loadSample(sample.json)}>
+              {sample.title}
+            </Button>
+          ))}
+        </div>
+      </div>
 
       {mode === 'json' && (
-        <Card>
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">ورودی JSON</CardTitle>
-              <Button variant="outline" size="sm" onClick={handleJsonToFields}>
-                <ArrowLeftRight className="h-4 w-4 ml-1" />
-                ویرایش دستی فیلدها
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Textarea
+        <div className="glass-card glow-effect p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-lg font-bold">ورودی JSON</h3>
+            <Button variant="outline" size="sm" onClick={handleJsonToFields}>
+              <ArrowLeftRight className="h-4 w-4 ml-1" />
+              ویرایش دستی فیلدها
+            </Button>
+          </div>
+          <div className="space-y-3">
+            <textarea
               value={jsonInput}
               onChange={e => { setJsonInput(e.target.value); setError(''); setSchemaOutput(''); }}
               placeholder='{ "name": "علی", "age": 30 }'
               dir="ltr"
-              className="min-h-[200px] resize-y font-mono text-sm"
+              className={`${inputCls} min-h-[200px] resize-y font-mono text-sm`}
             />
             <Button onClick={generateFromJson}>
               <Braces className="h-4 w-4 ml-2" />
               تولید Schema
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       {mode === 'manual' && (
-        <Card>
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">تعریف فیلدها</CardTitle>
-              <Button variant="outline" size="sm" onClick={addField}>
-                + افزودن فیلد
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <div className="glass-card glow-effect p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-lg font-bold">تعریف فیلدها</h3>
+            <Button variant="outline" size="sm" onClick={addField}>
+              + افزودن فیلد
+            </Button>
+          </div>
+          <div className="space-y-4">
             {fields.map((field, i) => (
-              <div key={i} className="p-3 rounded-lg bg-muted/50 space-y-3">
+              <div key={i} className="p-3 rounded-lg bg-[var(--muted)]/50 space-y-3">
                 <div className="grid grid-cols-12 gap-2 items-end">
                   <div className="col-span-12 sm:col-span-3">
-                    <Label className="text-xs">نام فیلد</Label>
-                    <Input
+                    <label className={labelCls}>نام فیلد</label>
+                    <input
                       value={field.name}
                       onChange={e => updateField(i, 'name', e.target.value)}
                       placeholder="fieldName"
                       dir="ltr"
-                      className="mt-1 text-sm"
+                      className={`${inputCls} text-sm`}
                     />
                   </div>
                   <div className="col-span-6 sm:col-span-3">
-                    <Label className="text-xs">نوع</Label>
+                    <label className={labelCls}>نوع</label>
                     <select
                       value={field.type}
                       onChange={e => updateField(i, 'type', e.target.value)}
-                      className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm mt-1"
+                      className="w-full h-10 rounded-lg border border-[var(--input)] bg-[var(--background)] px-3 py-1 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
                     >
                       {typeOptions.map(t => (
                         <option key={t.value} value={t.value}>{t.label}</option>
@@ -309,13 +300,13 @@ export default function JsonSchemaGenerator() {
                     </select>
                   </div>
                   <div className="col-span-6 sm:col-span-3">
-                    <Label className="text-xs">مثال</Label>
-                    <Input
+                    <label className={labelCls}>مثال</label>
+                    <input
                       value={field.example}
                       onChange={e => updateField(i, 'example', e.target.value)}
                       placeholder="مقدار نمونه"
                       dir="ltr"
-                      className="mt-1 text-sm"
+                      className={`${inputCls} text-sm`}
                     />
                   </div>
                   <div className="col-span-12 sm:col-span-3 flex items-center gap-2">
@@ -328,24 +319,22 @@ export default function JsonSchemaGenerator() {
                       />
                       الزامی
                     </label>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
+                    <button
+                      className="inline-flex items-center justify-center h-8 w-8 rounded-md text-sm transition-colors hover:bg-accent disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
                       onClick={() => removeField(i)}
                       disabled={fields.length <= 1}
                     >
                       <span className="text-red-500 text-lg">×</span>
-                    </Button>
+                    </button>
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs">توضیحات</Label>
-                  <Input
+                  <label className={labelCls}>توضیحات</label>
+                  <input
                     value={field.description}
                     onChange={e => updateField(i, 'description', e.target.value)}
                     placeholder="توضیح فیلد..."
-                    className="mt-1 text-sm"
+                    className={`${inputCls} text-sm`}
                   />
                 </div>
               </div>
@@ -354,38 +343,32 @@ export default function JsonSchemaGenerator() {
               <Braces className="h-4 w-4 ml-2" />
               تولید Schema
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       {error && (
-        <Card className="border-red-500/50">
-          <CardContent className="pt-4 pb-4">
-            <p className="text-sm text-red-500">{error}</p>
-          </CardContent>
-        </Card>
+        <div className="glass-card glow-effect p-4 border-red-500/50">
+          <p className="text-sm text-red-500">{error}</p>
+        </div>
       )}
 
       {schemaOutput && (
-        <Card>
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">خروجی JSON Schema</CardTitle>
-              <Button variant="ghost" size="sm" onClick={handleCopy}>
-                {copied ? <Check className="h-4 w-4 ml-1" /> : <Copy className="h-4 w-4 ml-1" />}
-                کپی
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <pre
-              className="bg-muted rounded-lg p-4 text-sm font-mono overflow-x-auto leading-relaxed"
-              dir="ltr"
-            >
-              {schemaOutput}
-            </pre>
-          </CardContent>
-        </Card>
+        <div className="glass-card glow-effect p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-lg font-bold">خروجی JSON Schema</h3>
+            <Button variant="ghost" size="sm" onClick={handleCopy}>
+              {copied ? <Check className="h-4 w-4 ml-1" /> : <Copy className="h-4 w-4 ml-1" />}
+              کپی
+            </Button>
+          </div>
+          <pre
+            className="bg-[var(--muted)] rounded-lg p-4 text-sm font-mono overflow-x-auto leading-relaxed"
+            dir="ltr"
+          >
+            {schemaOutput}
+          </pre>
+        </div>
       )}
     </div>
   );

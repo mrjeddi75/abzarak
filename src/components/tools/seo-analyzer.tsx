@@ -1,11 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Search, CheckCircle2, XCircle, AlertTriangle, Copy, Check } from 'lucide-react';
 import { toPersianDigits } from '@/lib/jalali';
 
@@ -60,9 +56,7 @@ function analyzeContent(content: string, keyword: string): SEOIssue[] {
   const issues: SEOIssue[] = [];
   const words = content.trim().split(/\s+/).filter(Boolean);
   const wordCount = words.length;
-  const charCount = content.length;
   const sentenceCount = content.split(/[.!?؟。]+/).filter(s => s.trim()).length;
-  const paragraphCount = content.split(/\n\s*\n/).filter(p => p.trim()).length || (content.trim() ? 1 : 0);
 
   if (!content.trim()) {
     issues.push({ type: 'error', title: 'محتوا خالی است', description: 'محتوای صفحه را وارد کنید تا آنالیز شود.' });
@@ -162,7 +156,7 @@ function analyzeUrl(url: string, keyword: string): SEOIssue[] {
       issues.push({ type: 'success', title: 'طول URL مناسب', description: `URL ${pathname.length} کاراکتر دارد.` });
     }
 
-    const hasSpecialChars = /[^a-zA-Z0-9\-\/_.?=&]/.test(pathname);
+    const hasSpecialChars = /[^a-zA-Z0-9\-\/_?.=&]/.test(pathname);
     if (hasSpecialChars) {
       issues.push({ type: 'warning', title: 'کاراکترهای خاص در URL', description: 'از کاراکترهای فارسی یا خاص در URL استفاده نکنید.' });
     } else {
@@ -226,51 +220,46 @@ export default function SEOAnalyzer() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const inputCls = 'w-full h-10 rounded-lg border border-[var(--input)] bg-[var(--background)] px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[var(--ring)]';
+
   return (
     <div className="space-y-4">
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg">کلمه کلیدی هدف</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Input
-            value={keyword}
-            onChange={(e) => { setKeyword(e.target.value); setAnalyzed(false); }}
-            placeholder="کلمه کلیدی اصلی صفحه را وارد کنید..."
-            dir="auto"
-          />
-          <p className="text-xs text-muted-foreground mt-2">
-            کلمه کلیدی برای تحلیل تراکم و محل قرارگیری استفاده می‌شود
-          </p>
-        </CardContent>
-      </Card>
+      <div className="glass-card glow-effect p-4">
+        <h3 className="text-lg font-bold mb-2">کلمه کلیدی هدف</h3>
+        <input
+          value={keyword}
+          onChange={(e) => { setKeyword(e.target.value); setAnalyzed(false); }}
+          placeholder="کلمه کلیدی اصلی صفحه را وارد کنید..."
+          dir="auto"
+          className={inputCls}
+        />
+        <p className="text-xs text-muted-foreground mt-2">
+          کلمه کلیدی برای تحلیل تراکم و محل قرارگیری استفاده می‌شود
+        </p>
+      </div>
 
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg">URL صفحه</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Input
-            value={url}
-            onChange={(e) => { setUrl(e.target.value); setAnalyzed(false); }}
-            placeholder="https://example.com/page"
-            dir="ltr"
-          />
-        </CardContent>
-      </Card>
+      <div className="glass-card glow-effect p-4">
+        <h3 className="text-lg font-bold mb-2">URL صفحه</h3>
+        <input
+          value={url}
+          onChange={(e) => { setUrl(e.target.value); setAnalyzed(false); }}
+          placeholder="https://example.com/page"
+          dir="ltr"
+          className={inputCls}
+        />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">عنوان صفحه (Title Tag)</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Input
+        <div className="glass-card glow-effect p-4">
+          <h3 className="text-lg font-bold mb-2">عنوان صفحه (Title Tag)</h3>
+          <div className="space-y-2">
+            <input
               value={title}
               onChange={(e) => { setTitle(e.target.value); setAnalyzed(false); }}
               placeholder="عنوان سئو صفحه..."
               dir="auto"
               maxLength={70}
+              className={inputCls}
             />
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>بهینه: ۳۰-۶۰ کاراکتر</span>
@@ -289,47 +278,41 @@ export default function SEOAnalyzer() {
                 </p>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">توضیحات متا (Meta Description)</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Textarea
+        <div className="glass-card glow-effect p-4">
+          <h3 className="text-lg font-bold mb-2">توضیحات متا (Meta Description)</h3>
+          <div className="space-y-2">
+            <textarea
               value={metaDesc}
               onChange={(e) => { setMetaDesc(e.target.value); setAnalyzed(false); }}
               placeholder="توضیحات متا صفحه..."
               dir="auto"
-              className="min-h-[100px] resize-y"
+              className={`${inputCls} min-h-[100px] resize-y`}
               maxLength={170}
             />
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>بهینه: ۱۲۰-۱۶۰ کاراکتر</span>
               <span className={metaDesc.length > 160 ? 'text-red-500' : ''}>{toPersianDigits(metaDesc.length)}/160</span>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg">محتوای صفحه</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Textarea
-            value={content}
-            onChange={(e) => { setContent(e.target.value); setAnalyzed(false); }}
-            placeholder="محتوای صفحه را اینجا وارد کنید... (پشتیبانی از Markdown)"
-            dir="auto"
-            className="min-h-[200px] resize-y text-base"
-          />
-          <p className="text-xs text-muted-foreground mt-2">
-            {toPersianDigits(wordCount)} کلمه | {toPersianDigits(content.length)} کاراکتر
-          </p>
-        </CardContent>
-      </Card>
+      <div className="glass-card glow-effect p-4">
+        <h3 className="text-lg font-bold mb-2">محتوای صفحه</h3>
+        <textarea
+          value={content}
+          onChange={(e) => { setContent(e.target.value); setAnalyzed(false); }}
+          placeholder="محتوای صفحه را اینجا وارد کنید... (پشتیبانی از Markdown)"
+          dir="auto"
+          className={`${inputCls} min-h-[200px] resize-y text-base`}
+        />
+        <p className="text-xs text-muted-foreground mt-2">
+          {toPersianDigits(wordCount)} کلمه | {toPersianDigits(content.length)} کاراکتر
+        </p>
+      </div>
 
       <Button onClick={() => setAnalyzed(true)} className="w-full lg:w-auto" disabled={!content.trim() && !title.trim()}>
         <Search className="h-4 w-4 ml-2" />
@@ -338,70 +321,64 @@ export default function SEOAnalyzer() {
 
       {analyzed && (
         <div className="space-y-4">
-          <Card>
-            <CardContent className="pt-6 pb-6">
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                <div className="relative w-28 h-28">
-                  <svg className="w-28 h-28 -rotate-90" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" strokeWidth="8" className="text-muted" />
-                    <circle
-                      cx="50" cy="50" r="42" fill="none"
-                      stroke="currentColor" strokeWidth="8"
-                      strokeDasharray={`${score * 2.64} ${264 - score * 2.64}`}
-                      strokeLinecap="round"
-                      className={scoreBg}
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className={`text-3xl font-bold ${scoreColor}`}>{toPersianDigits(score)}</span>
-                    <span className="text-[10px] text-muted-foreground">از ۱۰۰</span>
-                  </div>
-                </div>
-                <div className="text-center sm:text-right">
-                  <h3 className={`text-2xl font-bold ${scoreColor}`}>{scoreLabel}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {toPersianDigits(allIssues.length)} بررسی انجام شد
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {toPersianDigits(allIssues.filter(i => i.type === 'success').length)} موفق |{' '}
-                    {toPersianDigits(allIssues.filter(i => i.type === 'warning').length)} هشدار |{' '}
-                    {toPersianDigits(allIssues.filter(i => i.type === 'error').length)} خطا
-                  </p>
+          <div className="glass-card glow-effect p-6">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+              <div className="relative w-28 h-28">
+                <svg className="w-28 h-28 -rotate-90" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" strokeWidth="8" className="text-muted" />
+                  <circle
+                    cx="50" cy="50" r="42" fill="none"
+                    stroke="currentColor" strokeWidth="8"
+                    strokeDasharray={`${score * 2.64} ${264 - score * 2.64}`}
+                    strokeLinecap="round"
+                    className={scoreBg}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className={`text-3xl font-bold ${scoreColor}`}>{toPersianDigits(score)}</span>
+                  <span className="text-[10px] text-muted-foreground">از ۱۰۰</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+              <div className="text-center sm:text-right">
+                <h3 className={`text-2xl font-bold ${scoreColor}`}>{scoreLabel}</h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {toPersianDigits(allIssues.length)} بررسی انجام شد
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {toPersianDigits(allIssues.filter(i => i.type === 'success').length)} موفق |{' '}
+                  {toPersianDigits(allIssues.filter(i => i.type === 'warning').length)} هشدار |{' '}
+                  {toPersianDigits(allIssues.filter(i => i.type === 'error').length)} خطا
+                </p>
+              </div>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">جزئیات آنالیز</CardTitle>
-                <Button variant="ghost" size="sm" onClick={handleCopy}>
-                  {copied ? <Check className="h-4 w-4 ml-1" /> : <Copy className="h-4 w-4 ml-1" />}
-                  کپی گزارش
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {allIssues.map((issue, i) => (
-                  <div key={i} className="flex gap-3 p-3 rounded-lg bg-muted/50">
-                    {issue.type === 'success' ? (
-                      <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
-                    ) : issue.type === 'error' ? (
-                      <XCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
-                    ) : (
-                      <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
-                    )}
-                    <div>
-                      <p className="font-medium text-sm">{issue.title}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{issue.description}</p>
-                    </div>
+          <div className="glass-card glow-effect p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-bold">جزئیات آنالیز</h3>
+              <Button variant="ghost" size="sm" onClick={handleCopy}>
+                {copied ? <Check className="h-4 w-4 ml-1" /> : <Copy className="h-4 w-4 ml-1" />}
+                کپی گزارش
+              </Button>
+            </div>
+            <div className="space-y-3">
+              {allIssues.map((issue, i) => (
+                <div key={i} className="flex gap-3 p-3 rounded-lg bg-[var(--muted)]/50">
+                  {issue.type === 'success' ? (
+                    <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
+                  ) : issue.type === 'error' ? (
+                    <XCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+                  ) : (
+                    <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+                  )}
+                  <div>
+                    <p className="font-medium text-sm">{issue.title}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{issue.description}</p>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>

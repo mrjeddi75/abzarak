@@ -7,6 +7,7 @@ function Button({
   size = "default",
   onClick,
   type = "button",
+  disabled,
 }: {
   children: React.ReactNode;
   className?: string;
@@ -14,6 +15,7 @@ function Button({
   size?: "default" | "sm" | "lg" | "icon";
   onClick?: () => void;
   type?: "button" | "submit";
+  disabled?: boolean;
 }) {
   const variants: Record<string, string> = {
     default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm shadow-primary/20",
@@ -39,6 +41,7 @@ function Button({
         className
       )}
       onClick={onClick}
+      disabled={disabled}
     >
       {children}
     </button>

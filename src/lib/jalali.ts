@@ -81,6 +81,10 @@ export function getJalaliMonthDays(jy: number, jm: number): number {
   return isJalaliLeap(jy) ? 30 : 29;
 }
 
+export function toPersianDigits(str: string | number): string {
+  const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
+  return String(str).replace(/[0-9]/g, (d) => persianDigits[parseInt(d)]);
+}
 export function getFirstDayOfMonth(jy: number, jm: number): number {
   const [gy, gm, gd] = jalaliToGregorian(jy, jm, 1);
   const date = new Date(gy, gm - 1, gd);
