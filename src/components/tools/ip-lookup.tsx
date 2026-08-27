@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Globe, Loader2, AlertCircle, MapPin, Copy, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -11,53 +11,17 @@ export default function IPLookup() {
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
-  const mountedRef = useRef(false);
 
-  useEffect(() => {
-    mountedRef.current = true;
-    const controller = new AbortController();
-
-    (async () => {
-      setLoading(true);
-      try {
-        const res = await fetch("https://ipwho.is/", { signal: controller.signal });
-        const data = await res.json();
-        if (mountedRef.current) {
-          if (data.success === false) {
-            setError(data.message || "خطا در دریافت اطلاعات");
-            setResult(null);
-          } else {
-            setResult(data);
-          }
-        }
-      } catch (err: any) {
-        if (mountedRef.current && err.name !== "AbortError") {
-          setError("خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.");
-          setResult(null);
-        }
-      } finally {
-        if (mountedRef.current) {
-          setLoading(false);
-          setInitialLoading(false);
-        }
-      }
-    })();
-
-    return () => {
-      mountedRef.current = false;
-      controller.abort();
-    };
-  }, []);
-
-  const lookupCustom = async () => {
-    const target = query.trim();
-    if (!target) return;
+  const lookup = useCallback(async (q?: string) => {
+    const target = q || query.trim();
+    if (!target && q !== "") return;
 
     setLoading(true);
     setError("");
 
     try {
-      const res = await fetch(`https://ipwho.is/${encodeURIComponent(target)}`);
+      const url = target ? `https://ipwho.is/${encodeURIComponent(target)}` : "https://ipwho.is/";
+      const res = await fetch(url);
       const data = await res.json();
 
       if (data.success === false) {
@@ -72,30 +36,13 @@ export default function IPLookup() {
       setResult(null);
     } finally {
       setLoading(false);
+      setInitialLoading(false);
     }
-  };
+  }, [query]);
 
-  const lookupMyIp = async () => {
-    setQuery("");
-    setLoading(true);
-    setError("");
-    setResult(null);
-
-    try {
-      const res = await fetch("https://ipwho.is/");
-      const data = await res.json();
-
-      if (data.success === false) {
-        setError(data.message || "خطا در دریافت اطلاعات");
-      } else {
-        setResult(data);
-      }
-    } catch {
-      setError("خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    lookup();
+  }, [lookup]);
 
   const handleCopy = async () => {
     if (!result?.ip) return;
@@ -108,6 +55,10 @@ export default function IPLookup() {
     }
   };
 
+  const toPersianDigits = (n: number) => {
+    try { return n.toLocaleString("fa-IR"); } catch { return String(n); }
+  };
+
   const tz = result?.timezone;
   const tzId = typeof tz === "string" ? tz : (tz?.id || "—");
 
@@ -116,8 +67,8 @@ export default function IPLookup() {
     { label: "منطقه", value: result.region || "—" },
     { label: "کشور", value: result.country || "—" },
     { label: "ارائه‌دهنده اینترنت (ISP)", value: result.connection?.org || result.isp || "—" },
-    { label: "عرض جغرافیایی", value: result.latitude != null ? String(result.latitude) : "—" },
-    { label: "طول جغرافیایی", value: result.longitude != null ? String(result.longitude) : "—" },
+    { label: "عرض جغرافیایی", value: result.latitude != null ? toPersianDigits(result.latitude) : "—" },
+    { label: "طول جغرافیایی", value: result.longitude != null ? toPersianDigits(result.longitude) : "—" },
     { label: "منطقه زمانی", value: tzId },
     { label: "کد پستی", value: result.postal || "—" },
   ] : [];
@@ -177,10 +128,10 @@ export default function IPLookup() {
             placeholder="آدرس IP را وارد کنید (مثلاً 8.8.8.8)"
             dir="ltr"
             className="flex-1 rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground font-mono focus:outline-none focus:ring-2 focus:ring-primary"
-            onKeyDown={(e) => e.key === "Enter" && lookupCustom()}
+            onKeyDown={(e) => e.key === "Enter" && lookup()}
           />
           <button
-            onClick={lookupCustom}
+            onClick={() => lookup()}
             disabled={loading}
             className="rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
           >
@@ -188,7 +139,7 @@ export default function IPLookup() {
           </button>
         </div>
         <button
-          onClick={lookupMyIp}
+          onClick={() => { setQuery(""); lookup(); }}
           disabled={loading}
           className="flex w-full items-center justify-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-60"
         >

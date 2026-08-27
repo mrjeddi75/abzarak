@@ -17,7 +17,7 @@ interface AppStore {
 }
 
 export const useAppStore = create<AppStore>((set, get) => ({
-    activeTool: "home",
+  activeTool: "home",
   setActiveTool: (id) => set({ activeTool: id, activeCategory: null, sidebarOpen: false }),
   activeCategory: null,
   setActiveCategory: (id) => set({ activeCategory: id }),

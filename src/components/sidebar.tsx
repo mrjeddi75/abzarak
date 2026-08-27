@@ -3,12 +3,18 @@
 import { useAppStore } from "@/lib/store";
 import { toolCategories } from "@/lib/tools-config";
 import { Button } from "@/components/ui/button";
+import { Search, X, Sun, Moon, Home, ChevronDown } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
+const iconCache: Record<string, React.ComponentType<any>> = {};
+
 function ToolIcon({ name, className }: { name: string; className?: string }) {
-  const Icon = (LucideIcons as any)[name];
+  if (!iconCache[name]) {
+    iconCache[name] = (LucideIcons as any)[name];
+  }
+  const Icon = iconCache[name];
   return Icon ? <Icon className={className} /> : null;
 }
 
@@ -31,8 +37,11 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
     const filtered = cat.tools.filter(
       (t) =>
         t.name.includes(q) ||
+        t.name.toLowerCase().includes(q) ||
         t.description.includes(q) ||
-        t.id.includes(q)
+        t.description.toLowerCase().includes(q) ||
+        t.id.toLowerCase().includes(q) ||
+        t.component.toLowerCase().includes(q)
     );
     return { ...cat, tools: filtered };
   });
@@ -49,9 +58,9 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
           onClick={toggleTheme}
         >
           {theme === "dark" ? (
-            <LucideIcons.Sun className="h-4 w-4 text-yellow-400" />
+            <Sun className="h-4 w-4 text-yellow-400" />
           ) : (
-            <LucideIcons.Moon className="h-4 w-4" />
+            <Moon className="h-4 w-4" />
           )}
         </Button>
       </div>
@@ -59,10 +68,10 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
       {/* Search */}
       <div className="px-3 pb-2">
         <div className="relative">
-          <LucideIcons.Search className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
           <input
             type="text"
-            placeholder="جستجوی ابزار..."
+            placeholder="جستجوی ابزار... (فارسی/انگلیسی)"
             value={sidebarSearch}
             onChange={(e) => setSidebarSearch(e.target.value)}
             className="w-full rounded-lg border border-border bg-card py-2 pr-9 pl-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 transition-all"
@@ -72,7 +81,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
               onClick={() => setSidebarSearch("")}
               className="absolute left-2 top-1/2 -translate-y-1/2"
             >
-              <LucideIcons.X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+              <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
             </button>
           )}
         </div>
@@ -93,7 +102,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
               : "hover:bg-accent text-foreground"
           )}
         >
-          <ToolIcon name="Home" className="h-4 w-4" />
+          <Home className="h-4 w-4" />
           <span>خانه</span>
         </button>
 
@@ -127,7 +136,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
                 <span className="text-[10px] bg-secondary px-1.5 py-0.5 rounded-full text-muted-foreground font-normal">
                   {category.tools.length}
                 </span>
-                <LucideIcons.ChevronDown
+                <ChevronDown
                   className={cn(
                     "h-3 w-3 transition-transform duration-200",
                     isExpanded && "rotate-180"
@@ -168,7 +177,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
       {/* Footer */}
       <div className="p-3 border-t border-border/50">
         <p className="text-[10px] text-muted-foreground text-center">
-          ابزارک v3 — نسخه ۳
+          ابزارک v5 — بیش از ۶۰ ابزار رایگان
         </p>
       </div>
     </div>
@@ -201,7 +210,7 @@ export function MobileSidebar() {
             className="h-8 w-8 rounded-lg"
             onClick={() => setSidebarOpen(false)}
           >
-            <LucideIcons.X className="h-4 w-4" />
+            <X className="h-4 w-4" />
           </Button>
         </div>
         <SidebarContent onClose={() => setSidebarOpen(false)} />

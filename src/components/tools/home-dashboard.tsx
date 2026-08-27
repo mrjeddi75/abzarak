@@ -47,6 +47,7 @@ export default function HomeDashboard() {
   const [time, setTime] = useState("");
   const [weekday, setWeekday] = useState<string>("");
   const { setActiveTool, setActiveCategory, activeCategory, theme, toggleTheme } = useAppStore();
+
   const today = getJalaliToday();
   const day = today[2];
   const month = today[1];
@@ -93,7 +94,7 @@ export default function HomeDashboard() {
 
   return (
     <div className="space-y-6">
-            {/* Apple-style Clock */}
+      {/* Apple-style Clock */}
       <div className="animate-fade-in-up">
         <div className="glass-card glow-effect p-6 sm:p-10 overflow-hidden relative">
           {/* Ambient gradient orbs */}
@@ -110,8 +111,8 @@ export default function HomeDashboard() {
               </span>
             </div>
 
-            {/* Main time — Apple typography style */}
-            <div dir="ltr" className="flex items-center justify-center gap-0.5 font-light tracking-tighter select-none" style={{ fontFamily: "'SF Pro Display', 'Vazirmatn', -apple-system, system-ui, sans-serif" }}>
+            {/* Main time display — Apple typography style */}
+            <div className="flex items-center justify-center gap-0.5 font-light tracking-tighter select-none" style={{ fontFamily: "'SF Pro Display', 'Vazirmatn', -apple-system, system-ui, sans-serif" }}>
               <span className="text-7xl sm:text-8xl md:text-9xl text-foreground leading-none" style={{ fontWeight: 200 }}>
                 {hours}
               </span>
@@ -123,7 +124,7 @@ export default function HomeDashboard() {
               </span>
             </div>
 
-            {/* Seconds — Apple Watch thin style */}
+            {/* Seconds — thin, Apple Watch style */}
             <div className="mt-3 flex items-center gap-1.5">
               <div className="h-1 w-1 rounded-full bg-primary/40 animate-pulse" />
               <span className="text-base sm:text-lg font-light text-muted-foreground tabular-nums tracking-widest" style={{ fontWeight: 300 }}>
@@ -161,7 +162,7 @@ export default function HomeDashboard() {
           {nonHomeCategories.map((cat, idx) => (
             <button
               key={cat.id}
-               onClick={() => setActiveCategory(cat.id)}
+              onClick={() => setActiveCategory(cat.id)}
               className={cn(
                 "glass-card hover-glow p-4 text-right transition-all duration-300 animate-scale-in",
                 `stagger-${Math.min(idx + 3, 10)}`,
@@ -184,7 +185,8 @@ export default function HomeDashboard() {
           ))}
         </div>
       </div>
-             {/* Category Detail View */}
+
+      {/* Category Detail View */}
       {activeCategory && (() => {
         const cat = nonHomeCategories.find((c) => c.id === activeCategory);
         if (!cat) return null;
@@ -229,7 +231,7 @@ export default function HomeDashboard() {
           </div>
         );
       })()}
-      
+
       {/* Quick Access - Popular Tools */}
       <div className="animate-fade-in-up stagger-3">
         <h2 className="text-base font-bold text-foreground mb-4">دسترسی سریع</h2>

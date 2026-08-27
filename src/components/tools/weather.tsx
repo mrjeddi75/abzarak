@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import {
   Sun,
   CloudSun,
@@ -65,13 +65,7 @@ const weatherCodes: Record<number, { desc: string; icon: string }> = {
 const getWeatherInfo = (code: number) =>
   weatherCodes[code] || { desc: "نامشخص", icon: "Cloud" };
 
-const toPersianDigits = (n: number): string => {
-  try {
-    return n.toLocaleString("fa-IR");
-  } catch {
-    return String(n);
-  }
-};
+const toPersianDigits = (n: number): string => n.toLocaleString("fa-IR");
 
 const getDayName = (dateStr: string, index: number): string => {
   if (index === 0) return "امروز";
@@ -81,7 +75,7 @@ const getDayName = (dateStr: string, index: number): string => {
   ];
   try {
     const date = new Date(dateStr + "T00:00:00");
-    return dayNames[date.getDay()] || "";
+    return dayNames[date.getDay()];
   } catch {
     return "";
   }
@@ -112,9 +106,8 @@ export default function Weather() {
   const [forecast, setForecast] = useState<{ date: string; max: number; min: number; code: number }[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [mounted, setMounted] = useState(false);
 
-  const fetchWeather = useCallback(async (city: (typeof cities)[0]) => {
+  const fetchWeather = async (city: (typeof cities)[0]) => {
     setSelectedCity(city);
     setLoading(true);
     setError("");
@@ -155,17 +148,12 @@ export default function Weather() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
   useEffect(() => {
-    setMounted(true);
+    fetchWeather(cities[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    if (mounted) {
-      fetchWeather(cities[0]);
-    }
-  }, [mounted, fetchWeather]);
 
   const currentWeather = currentCode !== null ? getWeatherInfo(currentCode) : null;
 
