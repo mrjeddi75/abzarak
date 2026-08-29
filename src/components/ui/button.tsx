@@ -6,6 +6,7 @@ function Button({
   variant = "default",
   size = "default",
   onClick,
+  disabled = false,
   type = "button",
 }: {
   children: React.ReactNode;
@@ -13,6 +14,7 @@ function Button({
   variant?: "default" | "ghost" | "outline" | "destructive";
   size?: "default" | "sm" | "lg" | "icon";
   onClick?: () => void;
+  disabled?: boolean;
   type?: "button" | "submit";
 }) {
   const variants: Record<string, string> = {
@@ -39,6 +41,7 @@ function Button({
         className
       )}
       onClick={onClick}
+      disabled={disabled}
     >
       {children}
     </button>
