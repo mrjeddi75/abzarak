@@ -89,7 +89,7 @@ export default function HomeDashboard() {
   const stats = [
     { label: "ابزار فعال", value: toPersianDigits(String(allTools.length)), icon: "Layers" },
     { label: "دسته‌بندی", value: toPersianDigits(String(nonHomeCategories.length)), icon: "Grid3X3" },
-    { label: "نسخه", value: toPersianDigits("4"), icon: "Rocket" },
+    { label: "نسخه", value: toPersianDigits("5"), icon: "Rocket" },
   ];
 
   return (
@@ -237,14 +237,14 @@ export default function HomeDashboard() {
         <h2 className="text-base font-bold text-foreground mb-4">دسترسی سریع</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {[
-            { id: "calculator", icon: "Calculator", label: "ماشین‌حساب" },
-            { id: "salary-tax", icon: "FileText", label: "مالیات حقوق" },
-            { id: "json-formatter", icon: "Braces", label: "فرمت JSON" },
             { id: "date-converter", icon: "CalendarDays", label: "تبدیل تاریخ" },
             { id: "password-generator", icon: "KeyRound", label: "رمز عبور" },
-            { id: "base64", icon: "Lock", label: "Base64" },
             { id: "color-converter", icon: "Palette", label: "تبدیل رنگ" },
             { id: "regex-tester", icon: "Code2", label: "تستر Regex" },
+            { id: "word-counter", icon: "Hash", label: "شمارنده کلمات" },
+            { id: "hash-generator", icon: "Fingerprint", label: "هش مولد" },
+            { id: "speed-test", icon: "Gauge", label: "تست سرعت" },
+            { id: "unit-converter", icon: "Ruler", label: "تبدیل واحد" },
           ].map((tool, idx) => (
             <button
               key={tool.id}
