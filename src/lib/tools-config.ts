@@ -90,7 +90,7 @@ export const toolCategories: ToolCategory[] = [
     name: "کاربردی",
     icon: "Wrench",
     tools: [
-      { id: "deng-calculator", name: "دنگ‌محاس", description: "محاسبه سهم هر نفر — دنگ", icon: "Receipt", component: "BillSplitter" },
+      { id: "deng-calculator", name: "محاسبه دنگ هر نفر", description: "محاسبه سهم هر نفر — دنگ", icon: "Receipt", component: "BillSplitter" },
       { id: "fuel-calculator", name: "محاسبه مصرف بنزین", description: "محاسبه هزینه و مصرف سوخت", icon: "Fuel", component: "FuelCalculator" },
       { id: "discount", name: "ماشین‌حساب تخفیف", description: "محاسبه تخفیف چند مرحله‌ای", icon: "BadgePercent", component: "Discount" },
       { id: "password-generator", name: "تولید رمز عبور", description: "تولید رمز عبور تصادفی امن", icon: "KeyRound", component: "PasswordGenerator", seoTip: "تولید رمز عبور امن و تصادفی با طول و کاراکتر دلخواه" },
