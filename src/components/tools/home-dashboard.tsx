@@ -25,34 +25,10 @@ const categoryMeta: Record<string, { gradient: string; icon: string; accent: str
   encrypt:  { gradient: "from-red-500 to-orange-600",     icon: "Shield",          accent: "bg-red-500/10 text-red-400 border-red-500/20" },
 };
 
-function SecondsRing({ seconds }: { seconds: number }) {
-  const pct = (seconds / 60) * 100;
-  const r = 54;
-  const c = 2 * Math.PI * r;
-  const offset = c - (pct / 100) * c;
-  return (
-    <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 120 120">
-      <circle cx="60" cy="60" r={r} fill="none" stroke="var(--border)" strokeWidth="2" strokeDasharray="4 4" opacity="0.4" />
-      <circle
-        cx="60" cy="60" r={r} fill="none"
-        stroke="url(#secGrad)" strokeWidth="2.5" strokeLinecap="round"
-        strokeDasharray={c} strokeDashoffset={offset}
-        className="transition-all duration-1000 ease-linear"
-      />
-      <defs>
-        <linearGradient id="secGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="var(--gradient-start)" />
-          <stop offset="100%" stopColor="var(--gradient-end)" />
-        </linearGradient>
-      </defs>
-    </svg>
-  );
-}
-
 export default function HomeDashboard() {
   const [now, setNow] = useState(new Date());
   const [mounted, setMounted] = useState(false);
-  const { setActiveTool, setActiveCategory, activeCategory, theme, toggleTheme } = useAppStore();
+  const { setActiveTool, setActiveCategory, activeCategory } = useAppStore();
 
   const nonHomeCategories = toolCategories.filter((c) => c.id !== "home");
   const allTools = toolCategories.flatMap((cat) => cat.tools);
@@ -65,128 +41,115 @@ export default function HomeDashboard() {
     return () => clearInterval(id);
   }, []);
 
-  const timeStr = mounted ? now.toLocaleString("fa-IR", { timeZone: "Asia/Tehran", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }) : "";
-  const weekday = mounted ? now.toLocaleString("fa-IR", { timeZone: "Asia/Tehran", weekday: "long" }) : "";
-  const parts = timeStr.split(":");
-  const hours = parts[0] || "--";
-  const minutes = parts[1] || "--";
-  const seconds = parts[2] || "00";
-  const secNum = mounted ? (parseInt(seconds) || 0) : 0;
+  // Time — Tehran timezone, monospace LTR
+  const timeStr = mounted
+    ? now.toLocaleString("en-GB", { timeZone: "Asia/Tehran", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false })
+    : "00:00:00";
+  const weekday = mounted
+    ? now.toLocaleString("fa-IR", { timeZone: "Asia/Tehran", weekday: "long" })
+    : "—";
 
+  // Shamsi date
   const jToday = getJalaliToday();
-  const gToday = jalaliToGregorian(jToday[0], jToday[1], jToday[2]);
-  const gregorianMonth = mounted ? now.toLocaleString("en-US", { timeZone: "Asia/Tehran", month: "long" }) : "";
-  const gregorianDay = mounted ? now.toLocaleString("en-US", { timeZone: "Asia/Tehran", day: "numeric" }) : "";
-  const gregorianYear = mounted ? now.toLocaleString("en-US", { timeZone: "Asia/Tehran", year: "numeric" }) : "";
+  const shamsiStr = `${toPersianDigits(jToday[2])} ${jalaliMonthNames[jToday[1] - 1]} ${toPersianDigits(jToday[0])}`;
+  const shamsiShort = `${toPersianDigits(jToday[0])}/${toPersianDigits(String(jToday[1]).padStart(2, "0"))}/${toPersianDigits(String(jToday[2]).padStart(2, "0"))}`;
+
+  // Gregorian date
+  const gMonth = mounted ? now.toLocaleString("en-US", { timeZone: "Asia/Tehran", month: "long" }) : "";
+  const gDay = mounted ? now.getDate() : "";
+  const gYear = mounted ? now.getFullYear() : "";
+  const miladiStr = mounted ? `${gDay} ${gMonth} ${gYear}` : "—";
+  const miladiShort = mounted ? `${gYear}/${String(now.getMonth() + 1).padStart(2, "0")}/${String(gDay).padStart(2, "0")}` : "—";
 
   const featuredTools = [
-    { id: "date-converter", icon: "CalendarDays", label: "تبدیل تاریخ" },
-    { id: "password-generator", icon: "KeyRound", label: "رمز عبور" },
-    { id: "color-converter", icon: "Palette", label: "تبدیل رنگ" },
-    { id: "speed-test", icon: "Gauge", label: "تست سرعت" },
-    { id: "word-counter", icon: "Hash", label: "شمارنده" },
-    { id: "hash-generator", icon: "Fingerprint", label: "هش مولد" },
+    { id: "bmi", icon: "Scale", label: "BMI", color: "text-purple-400" },
+    { id: "unit-converter", icon: "Ruler", label: "تبدیل واحد", color: "text-emerald-400" },
+    { id: "password-generator", icon: "KeyRound", label: "رمز عبور", color: "text-yellow-400" },
+    { id: "color-converter", icon: "Palette", label: "رنگ", color: "text-pink-400" },
+    { id: "speed-test", icon: "Gauge", label: "تست سرعت", color: "text-cyan-400" },
+    { id: "word-counter", icon: "Hash", label: "شمارنده", color: "text-orange-400" },
   ];
 
   return (
-    <div className="space-y-5">
-      {/* ===== HERO: Clock + Dates ===== */}
-      <div className="animate-fade-in-up">
-        <div className="glass-card glow-effect overflow-hidden relative">
-          {/* Background mesh gradient */}
-          <div className="absolute inset-0 opacity-30 pointer-events-none">
-            <div className="absolute -top-32 -right-32 w-64 h-64 rounded-full bg-gradient-to-br from-indigo-500/30 to-purple-500/20 blur-3xl" />
-            <div className="absolute -bottom-24 -left-24 w-56 h-56 rounded-full bg-gradient-to-tr from-sky-500/20 to-cyan-500/10 blur-3xl" />
-          </div>
-
-          <div className="relative p-6 sm:p-8">
-            <div className="flex flex-col lg:flex-row items-center gap-8">
-              {/* Clock Ring */}
-              <div className="relative w-[140px] h-[140px] sm:w-[160px] sm:h-[160px] shrink-0">
-                <SecondsRing seconds={secNum} />
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-2xl sm:text-3xl font-extralight text-foreground tracking-tight" style={{ fontFamily: "'SF Pro Display', 'Vazirmatn', system-ui, sans-serif" }}>
-                    {hours}<span className="animate-blink text-foreground/30">:</span>{minutes}
-                  </span>
-                  <span className="text-[11px] text-muted-foreground/60 mt-0.5 tabular-nums tracking-wider">
-                    {seconds} <span className="text-[9px]">ثانیه</span>
-                  </span>
-                </div>
-              </div>
-
-              {/* Big Time Display + Weekday */}
-              <div className="flex-1 text-center lg:text-right">
-                <div className="flex items-center justify-center lg:justify-end gap-1 select-none" style={{ fontFamily: "'SF Pro Display', 'Vazirmatn', system-ui, sans-serif" }}>
-                  <span className="text-5xl sm:text-6xl md:text-7xl font-extralight text-foreground leading-none tracking-tighter">
-                    {hours}
-                  </span>
-                  <span className="text-5xl sm:text-6xl md:text-7xl font-extralight text-foreground/20 leading-none animate-blink">:</span>
-                  <span className="text-5xl sm:text-6xl md:text-7xl font-extralight text-foreground leading-none tracking-tighter">
-                    {minutes}
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground mt-2">{weekday}</p>
-              </div>
-            </div>
-
-            {/* Divider */}
-            <div className="my-5 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-
-            {/* Dual Date Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* Shamsi */}
-              <div className="flex items-center gap-3 rounded-xl bg-primary/[0.06] border border-primary/10 p-3.5">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 text-primary">
-                  <LucideIcons.Calendar className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-[10px] font-medium text-primary/70 uppercase tracking-wider mb-0.5">شمسی — جلالی</p>
-                  <p className="text-sm font-bold text-foreground">
-                    {toPersianDigits(jToday[2])} {jalaliMonthNames[jToday[1] - 1]} {toPersianDigits(jToday[0])}
-                  </p>
-                </div>
-              </div>
-              {/* Gregorian */}
-              <div className="flex items-center gap-3 rounded-xl bg-secondary/60 border border-border/40 p-3.5">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-secondary text-muted-foreground">
-                  <LucideIcons.CalendarDays className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-[10px] font-medium text-muted-foreground/70 uppercase tracking-wider mb-0.5">Gregorian — میلادی</p>
-                  <p className="text-sm font-bold text-foreground ltr" dir="ltr">
-                    {gregorianDay} {gregorianMonth} {gregorianYear}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className="space-y-4">
+      {/* ===== v7-Style Stats ===== */}
+      <div className="grid grid-cols-3 gap-3 animate-fade-in-up">
+        <div className="glass-card p-4 text-center">
+          <p className="text-3xl font-black text-primary">{toPersianDigits(String(allTools.length))}</p>
+          <p className="text-[10px] text-muted-foreground mt-1">ابزار کاربردی</p>
+        </div>
+        <div className="glass-card p-4 text-center">
+          <p className="text-3xl font-black text-purple-400">{toPersianDigits(String(nonHomeCategories.length))}</p>
+          <p className="text-[10px] text-muted-foreground mt-1">دسته‌بندی</p>
+        </div>
+        <div className="glass-card p-4 text-center">
+          <p className="text-3xl font-black text-emerald-400">{toPersianDigits("0")}</p>
+          <p className="text-[10px] text-muted-foreground mt-1">نیاز به API</p>
         </div>
       </div>
 
-      {/* ===== Stats Row ===== */}
-      <div className="grid grid-cols-3 gap-3 animate-fade-in-up stagger-1">
-        {[
-          { label: "ابزار فعال", value: toPersianDigits(String(allTools.length)), icon: "Layers", color: "text-blue-400" },
-          { label: "دسته‌بندی", value: toPersianDigits(String(nonHomeCategories.length)), icon: "Grid3X3", color: "text-emerald-400" },
-          { label: "نسخه", value: toPersianDigits("5"), icon: "Rocket", color: "text-amber-400" },
-        ].map((s, i) => (
-          <div key={i} className="glass-card p-3.5 text-center transition-all duration-300 hover-glow">
-            <ToolIcon name={s.icon} className={cn("h-5 w-5 mx-auto mb-1.5", s.color)} />
-            <p className="text-lg font-bold text-foreground">{s.value}</p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">{s.label}</p>
-          </div>
-        ))}
+      {/* ===== v7-Style Clock ===== */}
+      <div className="glass-card p-8 text-center relative overflow-hidden animate-fade-in-up stagger-1">
+        {/* gradient overlay from top */
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
+        <p className="text-xs text-muted-foreground mb-2 relative z-10">ساعت ایران</p>
+        <p
+          className="text-7xl font-black font-mono text-foreground relative z-10 tracking-wider"
+          dir="ltr"
+          style={{ fontVariantNumeric: "tabular-nums", textAlign: "center" }}
+        >
+          {timeStr}
+        </p>
+        <p className="text-sm text-muted-foreground mt-3 relative z-10">{weekday}</p>
       </div>
 
-      {/* ===== Categories — Bento Grid ===== */}
-      {!activeCategory && (
-        <div className="animate-fade-in-up stagger-2">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-bold text-foreground">دسته‌بندی ابزارها</h2>
-            <span className="text-[10px] text-muted-foreground px-2.5 py-1 rounded-full bg-secondary font-medium">
-              {toPersianDigits(String(allTools.length))} ابزار
+      {/* ===== v7-Style 3 Date Cards (Shamsi + Miladi) ===== */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-fade-in-up stagger-2">
+        {/* Shamsi */}
+        <div className="glass-card border-primary/10 p-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[10px] text-primary font-bold">تاریخ شمسی</p>
+            <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-lg font-mono">
+              {shamsiShort}
             </span>
           </div>
+          <p className="text-sm font-bold text-foreground leading-6">{shamsiStr}</p>
+        </div>
+        {/* Miladi */}
+        <div className="glass-card border-emerald-500/10 p-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[10px] text-emerald-400 font-bold">تاریخ میلادی</p>
+            <span className="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-lg font-mono" dir="ltr">
+              {miladiShort}
+            </span>
+          </div>
+          <p className="text-sm font-bold text-foreground leading-6" dir="ltr" style={{ textAlign: "left" }}>
+            {miladiStr}
+          </p>
+        </div>
+      </div>
+
+      {/* ===== v7-Style Quick Access ===== */}
+      <div className="animate-fade-in-up stagger-3">
+        <p className="text-xs text-muted-foreground mb-3">دسترسی سریع</p>
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+          {featuredTools.map((tool) => (
+            <button
+              key={tool.id}
+              onClick={() => setActiveTool(tool.id)}
+              className="glass-card hover-glow p-3 text-center transition-all duration-200"
+            >
+              <ToolIcon name={tool.icon} className={cn("w-5 h-5 mx-auto mb-1.5", tool.color)} />
+              <p className="text-[10px] text-muted-foreground">{tool.label}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ===== Categories Grid ===== */}
+      {!activeCategory && (
+        <div className="animate-fade-in-up stagger-4">
+          <p className="text-xs text-muted-foreground mb-3">دسته‌بندی ابزارها</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {nonHomeCategories.map((cat, idx) => {
               const meta = categoryMeta[cat.id] || { gradient: "from-gray-500 to-gray-600", icon: "Box", accent: "bg-gray-500/10 text-gray-400 border-gray-500/20" };
@@ -195,33 +158,22 @@ export default function HomeDashboard() {
                   key={cat.id}
                   onClick={() => setActiveCategory(cat.id)}
                   className={cn(
-                    "group glass-card p-4 text-right transition-all duration-300 hover-glow animate-scale-in relative overflow-hidden",
-                    `stagger-${Math.min(idx + 2, 10)}`
+                    "glass-card p-4 text-right transition-all duration-300 hover-glow animate-scale-in",
+                    `stagger-${Math.min(idx + 5, 10)}`
                   )}
                 >
-                  {/* Hover gradient overlay */}
-                  <div className={cn(
-                    "absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500",
-                    meta.gradient
-                  )} style={{ opacity: 0 }} />
-
-                  <div className="relative">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className={cn(
-                        "flex h-10 w-10 items-center justify-center rounded-xl border transition-all duration-300",
-                        meta.accent
-                      )}>
-                        <ToolIcon name={meta.icon || cat.icon} className="h-5 w-5" />
-                      </div>
-                      <span className="text-[10px] font-bold text-muted-foreground bg-background/50 group-hover:bg-white/20 px-2 py-0.5 rounded-full transition-colors duration-300">
-                        {toPersianDigits(String(cat.tools.length))}
-                      </span>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className={cn("flex h-10 w-10 items-center justify-center rounded-xl border", meta.accent)}>
+                      <ToolIcon name={meta.icon || cat.icon} className="h-5 w-5" />
                     </div>
-                    <p className="text-sm font-bold text-foreground group-hover:text-white transition-colors duration-300">{cat.name}</p>
-                    <p className="text-[11px] text-muted-foreground group-hover:text-white/70 transition-colors duration-300 mt-1 line-clamp-1">
-                      {cat.tools.slice(0, 3).map((t) => t.name).join(" ، ")}
-                    </p>
+                    <span className="text-[10px] font-bold text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">
+                      {toPersianDigits(String(cat.tools.length))}
+                    </span>
                   </div>
+                  <p className="text-sm font-bold text-foreground">{cat.name}</p>
+                  <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">
+                    {cat.tools.slice(0, 3).map((t) => t.name).join(" ، ")}
+                  </p>
                 </button>
               );
             })}
@@ -229,14 +181,13 @@ export default function HomeDashboard() {
         </div>
       )}
 
-      {/* ===== Category Detail View ===== */}
+      {/* ===== Category Detail ===== */}
       {activeCategory && (() => {
         const cat = nonHomeCategories.find((c) => c.id === activeCategory);
         if (!cat) return null;
         const meta = categoryMeta[cat.id] || { gradient: "from-gray-500 to-gray-600", icon: "Box", accent: "bg-gray-500/10 text-gray-400 border-gray-500/20" };
         return (
           <div className="animate-fade-in-up">
-            {/* Back header */}
             <div className="flex items-center gap-3 mb-4">
               <button
                 onClick={() => setActiveCategory(null)}
@@ -279,27 +230,6 @@ export default function HomeDashboard() {
           </div>
         );
       })()}
-
-      {/* ===== Featured Quick Access ===== */}
-      <div className="animate-fade-in-up stagger-3">
-        <h2 className="text-sm font-bold text-foreground mb-3">دسترسی سریع</h2>
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-          {featuredTools.map((tool) => (
-            <button
-              key={tool.id}
-              onClick={() => setActiveTool(tool.id)}
-              className="glass-card hover-glow flex flex-col items-center gap-2 p-3 transition-all duration-200 group"
-            >
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-200">
-                <ToolIcon name={tool.icon} className="h-4.5 w-4.5" />
-              </div>
-              <span className="text-[10px] font-medium text-muted-foreground group-hover:text-foreground transition-colors truncate w-full text-center">
-                {tool.label}
-              </span>
-            </button>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
