@@ -51,31 +51,33 @@ function SecondsRing({ seconds }: { seconds: number }) {
 
 export default function HomeDashboard() {
   const [now, setNow] = useState(new Date());
+  const [mounted, setMounted] = useState(false);
   const { setActiveTool, setActiveCategory, activeCategory, theme, toggleTheme } = useAppStore();
 
   const nonHomeCategories = toolCategories.filter((c) => c.id !== "home");
   const allTools = toolCategories.flatMap((cat) => cat.tools);
 
   useEffect(() => {
+    setMounted(true);
     const tick = () => setNow(new Date());
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, []);
 
-  const timeStr = now.toLocaleString("fa-IR", { timeZone: "Asia/Tehran", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
-  const weekday = now.toLocaleString("fa-IR", { timeZone: "Asia/Tehran", weekday: "long" });
+  const timeStr = mounted ? now.toLocaleString("fa-IR", { timeZone: "Asia/Tehran", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }) : "";
+  const weekday = mounted ? now.toLocaleString("fa-IR", { timeZone: "Asia/Tehran", weekday: "long" }) : "";
   const parts = timeStr.split(":");
-  const hours = parts[0] || "00";
-  const minutes = parts[1] || "00";
+  const hours = parts[0] || "--";
+  const minutes = parts[1] || "--";
   const seconds = parts[2] || "00";
-  const secNum = parseInt(seconds) || 0;
+  const secNum = mounted ? (parseInt(seconds) || 0) : 0;
 
   const jToday = getJalaliToday();
   const gToday = jalaliToGregorian(jToday[0], jToday[1], jToday[2]);
-  const gregorianMonth = now.toLocaleString("en-US", { timeZone: "Asia/Tehran", month: "long" });
-  const gregorianDay = now.toLocaleString("en-US", { timeZone: "Asia/Tehran", day: "numeric" });
-  const gregorianYear = now.toLocaleString("en-US", { timeZone: "Asia/Tehran", year: "numeric" });
+  const gregorianMonth = mounted ? now.toLocaleString("en-US", { timeZone: "Asia/Tehran", month: "long" }) : "";
+  const gregorianDay = mounted ? now.toLocaleString("en-US", { timeZone: "Asia/Tehran", day: "numeric" }) : "";
+  const gregorianYear = mounted ? now.toLocaleString("en-US", { timeZone: "Asia/Tehran", year: "numeric" }) : "";
 
   const featuredTools = [
     { id: "date-converter", icon: "CalendarDays", label: "تبدیل تاریخ" },
