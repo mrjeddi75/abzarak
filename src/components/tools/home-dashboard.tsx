@@ -90,7 +90,7 @@ export default function HomeDashboard() {
 
       {/* ===== v7-Style Clock ===== */}
       <div className="glass-card p-8 text-center relative overflow-hidden animate-fade-in-up stagger-1">
-        {/* gradient overlay from top */
+        { gradient overlay from top */
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
         <p className="text-xs text-muted-foreground mb-2 relative z-10">ساعت ایران</p>
         <p
